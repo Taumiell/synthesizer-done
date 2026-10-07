@@ -106,6 +106,7 @@ export function createMainSynth(definition, onLevel, onMute, onParameter) {
   resize.observe(panel);
   return {
     element: panel,
+    dispose: () => power.dispose(),
     updateMeter: (value) => meter.update(value),
     setPower(enabled) {
       power.setEnabled(enabled);

@@ -745,3 +745,63 @@ main > header .toggle-ball {
     flex: 1;
   }
 }
+
+/* Figma 2030 image: Overlay, opacity 1, 1575 × 2363 on a 604px panel.
+   Only Bird is vertically mirrored in the supplied Example. */
+.main-synth {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.main-synth::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: 260.7616%;
+  aspect-ratio: 1575 / 2363;
+  left: -17.8808%;
+  top: -2.1523cqw;
+  background: url('/figma/panel-dirt.png') center / cover no-repeat;
+  mix-blend-mode: overlay;
+  opacity: 1;
+}
+.main-synth[data-track='birds']::before {
+  transform: scaleY(-1);
+}
+
+/* SVG layers retain the native dimensions exported by Figma. */
+.main-synth .kit-knob-rotor {
+  width: 176px;
+  height: 185.513px;
+  left: calc(50% - 88px);
+  top: calc(50% - 92.7565px);
+  scale: calc(var(--knob-scale, 0.7) * 0.7077983);
+}
+.switch-light {
+  left: calc(50% - 113px);
+  top: calc(50% - 80.491px);
+  transform-origin: 50% 44.967%;
+  opacity: 0;
+  transition: opacity 35ms linear;
+}
+.kit-switch[aria-checked='true']:not(:disabled) .switch-light {
+  opacity: 1;
+}
+.kit-switch.switch-flicker-off[aria-checked='true']:not(:disabled) .switch-light {
+  opacity: 0;
+}
+.kit-switch[aria-checked='false'] .switch-light {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .switch-light {
+    transition: none;
+  }
+}
+
+/* Second revision: only the background texture is mirrored. */
+.main-synth[data-track='drone']::before { transform: scaleX(-1); }
+.main-separator { background: #A4A4A4; }
+/* The vector cap gradient is already oriented; avoid rotating it twice. */
+.knob-cap { transform: none; }

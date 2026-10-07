@@ -1,3 +1,4 @@
+import { attachSwitchFlicker } from './switch-flicker.js';
 import { createParameterControl } from './parameter.js';
 import { formatParameter } from '../music/controls.js';
 const asset = (name) => `${import.meta.env.BASE_URL}figma/${name}`;
@@ -18,10 +19,11 @@ export function createKitSwitch(label, enabled, onChange, variant = 'switch') {
   button.setAttribute('role', 'switch');
   button.setAttribute('aria-label', label);
   if (variant === 'switch') {
-    button.innerHTML = `<img class="switch-art switch-on" src="${asset('switch-default.svg')}" width="152.018" height="104.209" alt="" /><img class="switch-art switch-off" src="${asset('switch-variant2.svg')}" width="152.018" height="104.209" alt="" />`;
+    button.innerHTML = `<img class="switch-art switch-on" src="${asset('switch-default.svg')}" width="152.018" height="104.209" alt="" /><img class="switch-art switch-light" src="${asset('switch-light.svg')}" width="226" height="179" alt="" /><img class="switch-art switch-off" src="${asset('switch-variant2.svg')}" width="152.018" height="104.209" alt="" />`;
   } else
     button.innerHTML =
       '<span class="toggle-well"><span class="toggle-ball"></span></span>';
+  const flicker = variant === 'switch' ? attachSwitchFlicker(button) : null;
   const paint = () => button.setAttribute('aria-checked', String(enabled));
   button.addEventListener('click', () => {
     enabled = !enabled;
@@ -31,6 +33,7 @@ export function createKitSwitch(label, enabled, onChange, variant = 'switch') {
   paint();
   return {
     element: button,
+    dispose: () => flicker?.dispose(),
     setEnabled(value) {
       enabled = value;
       paint();
@@ -95,7 +98,7 @@ export function createKitKnob(track, control, onChange) {
   wrapper.classList.add('kit-knob-field');
   const button = wrapper.querySelector('button');
   button.classList.add('kit-knob');
-  button.innerHTML = `<span class="kit-knob-rotor"><img class="knob-body" src="${asset('knob-body.svg')}" width="124.573" height="131.306" alt="" /><img class="knob-marker" src="${asset('knob-marker.svg')}" width="9.53665" height="37.5506" alt="" /><span class="knob-cap"><img class="knob-center" src="${asset('knob-center.png')}" width="67.797" height="67.915" alt="" /></span></span>`;
+  button.innerHTML = `<span class="kit-knob-rotor"><img class="knob-body" src="${asset('knob-body.svg')}" width="176" height="185.513" alt="" /><img class="knob-marker" src="${asset('knob-marker.svg')}" width="13.4737" height="53.0526" alt="" /><span class="knob-cap"><img class="knob-center" src="${asset('knob-center.svg')}" width="95.786" height="95.953" alt="" /></span></span>`;
   wrapper.append(wrapper.querySelector('label'));
   return wrapper;
 }

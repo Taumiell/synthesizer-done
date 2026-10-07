@@ -127,6 +127,7 @@ draw();
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     events.abort();
+    cards.forEach((card) => card.dispose());
     clearTimeout(restartTimer);
     cancelAnimationFrame(animation);
     world?.dispose();
