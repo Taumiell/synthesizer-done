@@ -624,6 +624,101 @@ main > header .kit-toggle {
   flex: 0 0 118px;
   cursor: pointer;
 }
+
+/* First visit: center the title and power toggle until audio is ready. */
+body.is-intro main {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  max-width: none;
+  align-items: center;
+  justify-content: center;
+}
+body.is-intro main > header {
+  position: fixed;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+}
+body.is-intro main > header h1 {
+  flex: 0 1 auto;
+  font-size: clamp(30px, 5vw, 72px);
+}
+body.is-intro .tracks,
+body.is-entering .tracks {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(24px);
+}
+body.is-intro .tracks {
+  visibility: hidden;
+}
+body.is-entering .tracks {
+  visibility: visible;
+}
+body.is-ready .tracks {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+body.is-intro main > header .kit-toggle {
+  flex: 0 0 2.5em;
+  width: 2.5em;
+  height: 1.14407em;
+}
+body.is-intro main > header .toggle-well {
+  position: absolute;
+  inset: 7.407% 3.39%;
+  height: auto;
+}
+body.is-intro main > header .toggle-ball {
+  width: 33.898%;
+  height: auto;
+  aspect-ratio: 1;
+  top: 50%;
+  left: 6.78%;
+  transform: translateY(-50%);
+}
+body.is-intro main > header .kit-toggle[aria-checked='true'] .toggle-ball {
+  left: 59.322%;
+}
+body.is-intro .kit-toggle:disabled {
+  opacity: 1;
+  cursor: wait;
+}
+@media (max-width: 700px) {
+  body.is-intro main > header {
+    gap: 12px;
+  }
+  body.is-intro main > header h1 {
+    font-size: clamp(26px, 5.6vw, 38px);
+  }
+  body.is-intro main > header .kit-toggle {
+    flex-basis: clamp(73px, 14vw, 98px);
+    width: clamp(73px, 14vw, 98px);
+    height: clamp(33.407px, 6.407vw, 44.847px);
+  }
+}
+@media (max-width: 380px) {
+  body.is-intro main > header h1 {
+    font-size: clamp(22px, 5.6vw, 26px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body.is-ready .tracks {
+    transition: opacity 420ms ease, transform 420ms ease;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.is-ready .tracks {
+    transition: none;
+  }
+}
 .toggle-ball {
   overflow: hidden;
   transition: left 180ms ease-out;

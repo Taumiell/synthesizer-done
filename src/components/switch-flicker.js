@@ -1,5 +1,6 @@
 // Each powered switch has its own irregular, short interruptions of the steady light.
-export function attachSwitchFlicker(button) {
+export function attachSwitchFlicker(button, count = 4) {
+  if (count === 0) return { dispose() {} };
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const phase = Math.random() * 1100;
   let timer;
@@ -19,7 +20,7 @@ export function attachSwitchFlicker(button) {
   };
   const schedule = () => {
     later(
-      () => burst(4),
+      () => burst(count),
       2800 + phase + Math.random() * 2600,
     );
   };

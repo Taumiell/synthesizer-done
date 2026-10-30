@@ -12,7 +12,7 @@ export function createKitButton(text, onClick) {
   return button;
 }
 
-export function createKitSwitch(label, enabled, onChange, variant = 'switch') {
+export function createKitSwitch(label, enabled, onChange, variant = 'switch', flickerCount = 4) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = `kit-${variant}`;
@@ -23,7 +23,7 @@ export function createKitSwitch(label, enabled, onChange, variant = 'switch') {
   } else
     button.innerHTML =
       '<span class="toggle-well"><span class="toggle-ball"></span></span>';
-  const flicker = variant === 'switch' ? attachSwitchFlicker(button) : null;
+  const flicker = variant === 'switch' ? attachSwitchFlicker(button, flickerCount) : null;
   const paint = () => button.setAttribute('aria-checked', String(enabled));
   button.addEventListener('click', () => {
     enabled = !enabled;

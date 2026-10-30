@@ -8,6 +8,7 @@ import { initialParameters } from './music/controls.js';
 
 let world;
 let busy = false;
+let activationPending = false;
 let animation;
 const events = new AbortController();
 const settings = Object.fromEntries(
@@ -45,22 +46,24 @@ const cards = [...trackDefinitions]
   });
 
 const master = createKitSwitch(
-  'Synthesizer power',
+  'Start synthesizer',
   false,
   (enabled) => {
     if (enabled) startPlayback();
-    else stopPlayback();
   },
   'toggle',
 );
 master.element.id = 'master-power';
 document.querySelector('main > header').append(master.element);
-let restartTimer;
 
 function renderPlayback() {
   const playing = Boolean(world?.playing);
-  master.setEnabled(playing);
+  master.setEnabled(playing || activationPending);
   master.element.disabled = busy;
+  master.element.setAttribute(
+    'aria-label',
+    busy ? 'Loading synthesizer' : 'Start synthesizer',
+  );
   document.body.classList.toggle('is-playing', playing);
   document.body.classList.toggle('is-loading', busy);
   for (const card of cards) {
@@ -77,6 +80,9 @@ async function startPlayback() {
     renderPlayback();
     return;
   }
+  const title = document.querySelector('main > header h1');
+  const titleStart = title.getBoundingClientRect();
+  activationPending = true;
   busy = true;
   renderPlayback();
   try {
@@ -89,10 +95,12 @@ async function startPlayback() {
         world.setParameter(id, key, value);
     }
     await world.start();
+    await enterSynthesizer(title, titleStart);
   } catch (error) {
     console.error('Audio initialization failed:', error);
     world?.dispose();
     world = undefined;
+    activationPending = false;
     cards.forEach((card) => card.setPower(false));
   } finally {
     busy = false;
@@ -100,20 +108,39 @@ async function startPlayback() {
   }
 }
 
-function stopPlayback() {
-  if (busy || !world?.playing) {
-    renderPlayback();
-    return;
-  }
-  world.stop();
-  cards.forEach((card) => card.setPower(false));
-  // Keep both entry points from scheduling Start before the audio fade ends.
-  busy = true;
-  renderPlayback();
-  restartTimer = setTimeout(() => {
-    busy = false;
-    renderPlayback();
-  }, 160);
+async function enterSynthesizer(title, titleStart) {
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const toggleAnimation = master.element.animate(
+    [{ opacity: 1 }, { opacity: 0 }],
+    { duration: reduceMotion ? 0 : 520, easing: 'ease-in-out', fill: 'forwards' },
+  );
+  await toggleAnimation.finished;
+  master.element.hidden = true;
+  master.element.remove();
+
+  document.body.classList.add('is-entering');
+  document.body.classList.remove('is-intro');
+
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  const titleEnd = title.getBoundingClientRect();
+  const duration = reduceMotion ? 0 : 1400;
+  const titleAnimation = title.animate(
+    [
+      {
+        transformOrigin: 'top left',
+        transform: `translate(${titleStart.left - titleEnd.left}px, ${titleStart.top - titleEnd.top}px) scale(${titleStart.width / titleEnd.width}, ${titleStart.height / titleEnd.height})`,
+      },
+      { transformOrigin: 'top left', transform: 'translate(0, 0) scale(1, 1)' },
+    ],
+    { duration, easing: 'cubic-bezier(0.42, 0, 0.28, 1)' },
+  );
+  await titleAnimation.finished;
+  document.body.classList.remove('is-entering');
+  document.body.classList.add('is-ready');
+  activationPending = false;
+
+  if (!reduceMotion) await new Promise((resolve) => setTimeout(resolve, 420));
 }
 renderPlayback();
 
@@ -128,7 +155,6 @@ if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     events.abort();
     cards.forEach((card) => card.dispose());
-    clearTimeout(restartTimer);
     cancelAnimationFrame(animation);
     world?.dispose();
   });

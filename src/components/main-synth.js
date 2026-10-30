@@ -29,7 +29,8 @@ export function createMainSynth(definition, onLevel, onMute, onParameter) {
     panel.classList.toggle('main-muted', !enabled);
     onMute(definition.id, !enabled);
   };
-  const power = createKitSwitch(`${track.name} power`, false, applyPower);
+  const flickerCount = { piano: 4, drone: 0, birds: 0, rain: 3 }[definition.id];
+  const power = createKitSwitch(`${track.name} power`, false, applyPower, 'switch', flickerCount);
   header.append(title, power.element);
 
   const source = document.createElement('div');
